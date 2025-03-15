@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NEWS 1</title>
+    <link rel="icon" type="image/png" href="logo.png">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #1c1c1c, #6b2500);
+            font-family: 'Montserrat', sans-serif;
+            color: #fff;
+        }
+
+        .container {
+            display: inline-block;
+            background: rgba(0, 0, 0, 0.65);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            transition: transform 0.3s ease;
+        }
+
+        .container:hover {
+            transform: scale(1.03);
+        }
+
+        img {
+            max-width: 150px;
+            width: 100%;
+            height: auto;
+            transition: transform 0.3s ease;
+        }
+
+        img:hover {
+            transform: scale(1.15);
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin: 20px 0;
+            background: linear-gradient(135deg, #ff6600, #ffcc00);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+        }
+
+        @media (max-width: 480px) {
+            .container {
+                padding: 30px;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+        }
+
+        ::selection {
+            background-color: orange;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <img src="https://goatclient.github.io/logo.png" alt="GoatClient Logo">
+    <h1>Beispiel News. Einfache html seitde...</h1>
+    <p>Hier kann dann alles möglche stehen...</p>
+</div>
+</body>
+</html>
