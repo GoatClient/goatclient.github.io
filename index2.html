@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GOAT Client - Der ultimative Minecraft Client</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Colors */
+      --color-primary: #ff7700;
+      --color-primary-light: #ff9500;
+      --color-primary-dark: #e56b00;
+      --color-dark: #171717;
+      --color-dark-light: #1e1e1e;
+      --color-dark-lighter: #232323;
+      --color-gray: #444;
+      --color-gray-light: #888;
+      --color-white: #fff;
+      
+      /* Spacing */
+      --space-xs: 0.5rem;
+      --space-sm: 1rem;
+      --space-md: 1.5rem;
+      --space-lg: 2rem;
+      --space-xl: 3rem;
+      --space-xxl: 5rem;
+      
+      /* Typography */
+      --font-size-xs: 0.875rem;
+      --font-size-sm: 1rem;
+      --font-size-md: 1.125rem;
+      --font-size-lg: 1.5rem;
+      --font-size-xl: 2rem;
+      --font-size-xxl: 3rem;
+      
+      /* Border Radius */
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+      
+      /* Transition */
+      --transition-fast: 0.2s ease;
+      --transition-normal: 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      --transition-slow: 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+      
+      /* Layout */
+      --container-width: 1200px;
+      --header-height: 70px;
+    }
+    
+    /* Reset & Base Styles */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: var(--header-height);
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      line-height: 1.6;
+      color: var(--color-white);
+      background-color: var(--color-dark);
+      overflow-x: hidden;
+    }
+    
+    img {
+      max-width: 100%;
+      height: auto;
+      display: block;
+    }
+    
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+    
+    ul {
+      list-style: none;
+    }
+    
+    button {
+      font-family: inherit;
+      cursor: pointer;
+      border: none;
+      background: none;
+    }
+    
+    /* Container */
+    .container {
+      width: 100%;
+      max-width: var(--container-width);
+      margin: 0 auto;
+      padding: 0 var(--space-md);
+    }
+    
+    /* Header */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: var(--header-height);
+      background-color: rgba(23, 23, 23, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 1000;
+      border-bottom: 1px solid rgba(255, 119, 0, 0.1);
+      transition: var(--transition-normal);
+    }
+    
+    .header.scrolled {
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    }
+    
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 100%;
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xs);
+    }
+    
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      border-radius: var(--radius-sm);
+      transition: var(--transition-normal);
+    }
+    
+    .logo:hover .logo-img {
+      transform: rotate(5deg) scale(1.05);
+    }
+    
+    .logo-text {
+      font-size: var(--font-size-md);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+    
+    .nav {
+      display: flex;
+      gap: var(--space-lg);
+    }
+    
+    .nav-link {
+      position: relative;
+      font-size: var(--font-size-sm);
+      font-weight: 500;
+      padding: var(--space-xs) 0;
+      transition: color var(--transition-fast);
+    }
+    
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+      transition: width var(--transition-normal);
+    }
+    
+    .nav-link:hover {
+      color: var(--color-primary-light);
+    }
+    
+    .nav-link:hover::after {
+      width: 100%;
+    }
+    
+    .menu-toggle {
+      display: none;
+      width: 30px;
+      height: 20px;
+      position: relative;
+      z-index: 1001;
+    }
+    
+    .menu-toggle span {
+      display: block;
+      position: absolute;
+      height: 2px;
+      width: 100%;
+      background: var(--color-white);
+      border-radius: 2px;
+      opacity: 1;
+      left: 0;
+      transform: rotate(0deg);
+      transition: var(--transition-fast);
+    }
+    
+    .menu-toggle span:nth-child(1) {
+      top: 0;
+    }
+    
+    .menu-toggle span:nth-child(2), .menu-toggle span:nth-child(3) {
+      top: 9px;
+    }
+    
+    .menu-toggle span:nth-child(4) {
+      top: 18px;
+    }
+    
+    .menu-toggle.active span:nth-child(1) {
+      top: 9px;
+      width: 0;
+      left: 50%;
+    }
+    
+    .menu-toggle.active span:nth-child(2) {
+      transform: rotate(45deg);
+    }
+    
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg);
+    }
+    
+    .menu-toggle.active span:nth-child(4) {
+      top: 9px;
+      width: 0;
+      left: 50%;
+    }
+    
+    .mobile-nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100vh;
+      background: var(--color-dark-light);
+      z-index: 1000;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      gap: var(--space-lg);
+      opacity: 0;
+      visibility: hidden;
+      transition: var(--transition-normal);
+      transform: translateY(-10px);
+    }
+    
+    .mobile-nav.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .mobile-nav-link {
+      font-size: var(--font-size-lg);
+      font-weight: 600;
+      transition: color var(--transition-fast);
+    }
+    
+    .mobile-nav-link:hover {
+      color: var(--color-primary);
+    }
+    
+    /* Hero Section */
+    .hero {
+      padding: calc(var(--header-height) + var(--space-xxl)) 0 var(--space-xxl);
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .hero::before, .hero::after {
+      content: '';
+      position: absolute;
+      pointer-events: none;
+    }
+    
+    .hero::before {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(255, 119, 0, 0.15), transparent 70%);
+      top: -200px;
+      left: -200px;
+      border-radius: var(--radius-full);
+    }
+    
+    .hero::after {
+      width: 400px;
+      height: 400px;
+      background: radial-gradient(circle, rgba(255, 119, 0, 0.1), transparent 70%);
+      bottom: -100px;
+      right: -100px;
+      border-radius: var(--radius-full);
+    }
+    
+    .hero-container {
+      display: flex;
+      align-items: center;
+      gap: var(--space-xl);
+      position: relative;
+      z-index: 2;
+    }
+    
+    .hero-content {
+      flex: 1;
+    }
+    
+    .hero-title {
+      font-size: var(--font-size-xxl);
+      font-weight: 700;
+      line-height: 1.2;
+      margin-bottom: var(--space-lg);
+      letter-spacing: -0.5px;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .hero-description {
+      font-size: var(--font-size-md);
+      margin-bottom: var(--space-lg);
+      color: rgba(255, 255, 255, 0.9);
+      max-width: 600px;
+    }
+    
+    .button-group {
+      display: flex;
+      gap: var(--space-md);
+      flex-wrap: wrap;
+    }
+    
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-xs);
+      padding: var(--space-sm) var(--space-lg);
+      border-radius: var(--radius-md);
+      font-weight: 600;
+      transition: var(--transition-normal);
+      font-size: var(--font-size-sm);
+    }
+    
+    .btn-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .btn-primary {
+      background: linear-gradient(135deg, var(--color-primary), var(--color-primary-light));
+      color: var(--color-white);
+      box-shadow: 0 5px 15px rgba(255, 119, 0, 0.3);
+    }
+    
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 25px rgba(255, 119, 0, 0.4);
+    }
+    
+    .btn-secondary {
+      background-color: transparent;
+      color: var(--color-white);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    
+    .btn-secondary:hover {
+      transform: translateY(-3px);
+      border-color: var(--color-primary);
+      color: var(--color-primary-light);
+    }
+    
+    .hero-image-container {
+      flex: 1;
+      position: relative;
+    }
+    
+    .hero-image {
+      border-radius: var(--radius-lg);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 119, 0, 0.2);
+      transition: var(--transition-normal);
+      transform-style: preserve-3d;
+      transform: perspective(1000px);
+      max-width: 500px;
+      margin: 0 auto;
+    }
+    
+    .hero-image:hover {
+      transform: perspective(1000px) rotateY(-5deg) translateY(-10px);
+      box-shadow: 0 30px 50px rgba(0, 0, 0, 0.4);
+      border-color: rgba(255, 119, 0, 0.4);
+    }
+    
+    /* Section Styles */
+    .section {
+      padding: var(--space-xxl) 0;
+      position: relative;
+    }
+    
+    .section-dark {
+      background-color: var(--color-dark);
+    }
+    
+    .section-darker {
+      background-color: var(--color-dark-lighter);
+    }
+    
+    .section-header {
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto var(--space-xl);
+    }
+    
+    .section-title {
+      font-size: var(--font-size-xl);
+      font-weight: 700;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .section-divider {
+      width: 60%;
+      max-width: 300px;
+      height: 2px;
+      background: linear-gradient(90deg,
+        rgba(255, 119, 0, 0) 0%,
+        rgba(255, 119, 0, 0.7) 50%,
+        rgba(255, 119, 0, 0) 100%
+      );
+      margin: var(--space-sm) auto;
+    }
+    
+    .section-description {
+      font-size: var(--font-size-md);
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    /* Features Section */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: var(--space-lg);
+    }
+    
+    .feature-card {
+      background-color: var(--color-dark-light);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 119, 0, 0.2);
+      transition: var(--transition-normal);
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 119, 0, 0.4);
+    }
+    
+    .feature-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, rgba(255, 119, 0, 0.1), rgba(255, 149, 0, 0.1));
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: var(--space-md);
+    }
+    
+    .feature-icon svg {
+      width: 30px;
+      height: 30px;
+      color: var(--color-primary-light);
+    }
+    
+    .feature-title {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      margin-bottom: var(--space-sm);
+    }
+    
+    .feature-description {
+      color: rgba(255, 255, 255, 0.7);
+      margin-top: auto;
+    }
+    
+    /* Download Section */
+    .download-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: var(--space-lg);
+    }
+    
+    .download-card {
+      background-color: var(--color-dark-light);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      text-align: center;
+      border: 1px solid rgba(255, 119, 0, 0.2);
+      transition: var(--transition-normal);
+    }
+    
+    .download-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      border-color: rgba(255, 119, 0, 0.4);
+    }
+    
+    .download-icon {
+      width: 70px;
+      height: 70px;
+      background: linear-gradient(135deg, rgba(255, 119, 0, 0.1), rgba(255, 149, 0, 0.1));
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto var(--space-md);
+    }
+    
+    .download-icon svg {
+      width: 35px;
+      height: 35px;
+      color: var(--color-primary-light);
+    }
+    
+    .download-title {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .download-description {
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: var(--space-md);
+    }
+    
+    .download-btn {
+      width: 100%;
+    }
+    
+    /* FAQ Section */
+    .faq-container {
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    
+    .faq-item {
+      background-color: var(--color-dark-light);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-md);
+      overflow: hidden;
+      border: 1px solid rgba(255, 119, 0, 0.2);
+      transition: var(--transition-normal);
+    }
+    
+    .faq-item:hover {
+      border-color: rgba(255, 119, 0, 0.4);
+    }
+    
+    .faq-question {
+      padding: var(--space-md);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      user-select: none;
+    }
+    
+    .faq-question h3 {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+    }
+    
+    .faq-toggle {
+      width: 20px;
+      height: 20px;
+      position: relative;
+      transition: transform var(--transition-normal);
+    }
+    
+    .faq-toggle::before, .faq-toggle::after {
+      content: '';
+      position: absolute;
+      background-color: var(--color-primary);
+      top: 50%;
+      left: 0;
+      transform: translateY(-50%);
+      width: 100%;
+      height: 2px;
+      transition: var(--transition-normal);
+    }
+    
+    .faq-toggle::after {
+      transform: translateY(-50%) rotate(90deg);
+    }
+    
+    .faq-item.active .faq-toggle::after {
+      transform: translateY(-50%) rotate(0);
+    }
+    
+    .faq-answer {
+      padding: 0 var(--space-md);
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height var(--transition-normal), padding var(--transition-normal);
+    }
+    
+    .faq-item.active .faq-answer {
+      padding: 0 var(--space-md) var(--space-md);
+      max-height: 300px;
+    }
+    
+    /* Contact Section */
+    .contact-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--space-xl);
+    }
+    
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+    
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+    }
+    
+    .contact-icon {
+      width: 60px;
+      height: 60px;
+      background: linear-gradient(135deg, rgba(255, 119, 0, 0.1), rgba(255, 149, 0, 0.1));
+      border-radius: var(--radius-full);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .contact-icon svg {
+      width: 24px;
+      height: 24px;
+      color: var(--color-primary-light);
+    }
+    
+    .contact-text h3 {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      margin-bottom: var(--space-xs);
+    }
+    
+    .contact-text p {
+      color: rgba(255, 255, 255, 0.7);
+    }
+    
+    .contact-form {
+      background-color: var(--color-dark-light);
+      padding: var(--space-lg);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(255, 119, 0, 0.2);
+    }
+    
+    .form-group {
+      margin-bottom: var(--space-md);
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: var(--space-xs);
+      font-weight: 500;
+    }
+    
+    .form-input, .form-textarea {
+      width: 100%;
+      padding: var(--space-sm);
+      border-radius: var(--radius-sm);
+      background-color: var(--color-dark);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--color-white);
+      font-family: inherit;
+      font-size: var(--font-size-sm);
+      transition: border-color var(--transition-fast);
+    }
+    
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--color-primary);
+    }
+    
+    .form-textarea {
+      min-height: 150px;
+      resize: vertical;
+    }
+    
+    .form-submit {
+      width: 100%;
+    }
+    
+    /* Footer */
+    .footer {
+      background-color: var(--color-dark-light);
+      border-top: 1px solid rgba(255, 119, 0, 0.2);
+      padding: var(--space-xl) 0 var(--space-md);
+    }
+    
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.5fr repeat(3, 1fr);
+      gap: var(--space-xl);
+      margin-bottom: var(--space-xl);
+    }
+    
+    .footer-brand {
+      max-width: 350px;
+    }
+    
+    .footer-logo {
+      width: 50px;
+      height: 50px;
+      margin-bottom: var(--space-md);
+      border-radius: var(--radius-sm);
+    }
+    
+    .footer-description {
+      color: rgba(255, 255, 255, 0.7);
+      margin-bottom: var(--space-lg);
+    }
+    
+    .footer-heading {
+      font-size: var(--font-size-md);
+      font-weight: 600;
+      margin-bottom: var(--space-md);
+      position: relative;
+      padding-bottom: var(--space-xs);
+    }
+    
+    .footer-heading::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 30px;
+      height: 2px;
+      background: linear-gradient(90deg, var(--color-primary), var(--color-primary-light));
+    }
+    
+    .footer-links {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+    
+    .footer-link {
+      color: rgba(255, 255, 255, 0.7);
+      transition: color var(--transition-fast);
+    }
+    
+    .footer-link:hover {
+      color: var(--color-primary-light);
+    }
+    
+    .social-links {
+      display: flex;
+      gap: var(--space-sm);
+    }
+    
+    .social-link {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 40px;
+      height: 40px;
+      background-color: var(--color-dark);
+      border-radius: var(--radius-full);
+      transition: var(--transition-normal);
+    }
+    
+    .social-link svg {
+      width: 20px;
+      height: 20px;
+      color: rgba(255, 255, 255, 0.7);
+      transition: color var(--transition-fast);
+    }
+    
+    .social-link:hover {
+      background-color: var(--color-primary);
+      transform: translateY(-3px);
+    }
+    
+    .social-link:hover svg {
+      color: var(--color-white);
+    }
+    
+    .footer-bottom {
+      padding-top: var(--space-md);
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+    }
+    
+    .copyright {
+      color: rgba(255, 255, 255, 0.5);
+      font-size: var(--font-size-xs);
+    }
+    
+    /* Feature Box (Used in hero) */
+    .feature-boxes {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--space-md);
+      margin-top: var(--space-lg);
+    }
+    
+    .feature-box {
+      background-color: rgba(30, 30, 30, 0.7);
+      backdrop-filter: blur(10px);
+      padding: var(--space-sm) var(--space-md);
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      border: 1px solid rgba(255, 119, 0, 0.1);
+      transition: var(--transition-normal);
+    }
+    
+    .feature-box:hover {
+      transform: translateY(-5px);
+      border-color: rgba(255, 119, 0, 0.3);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+    
+    .feature-box-icon {
+      color: var(--color-primary);
+    }
+    
+    .feature-box-text {
+      font-weight: 500;
+      font-size: var(--font-size-sm);
+    }
+    
+    /* Animations */
+    @keyframes fadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .animate-fadeUp {
+      animation: fadeUp 0.6s ease-out forwards;
+    }
+    
+    .delay-100 { animation-delay: 0.1s; }
+    .delay-200 { animation-delay: 0.2s; }
+    .delay-300 { animation-delay: 0.3s; }
+    .delay-400 { animation-delay: 0.4s; }
+    .delay-500 { animation-delay: 0.5s; }
+    
+    /* Responsive Styles */
+    @media (max-width: 992px) {
+      :root {
+        --font-size-xxl: 2.5rem;
+        --font-size-xl: 1.8rem;
+      }
+      
+      .hero-container {
+        flex-direction: column;
+        text-align: center;
+      }
+      
+      .hero-description {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      
+      .button-group {
+        justify-content: center;
+      }
+      
+      .contact-container {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: var(--space-lg);
+      }
+      
+      .feature-boxes {
+        justify-content: center;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      :root {
+        --space-xxl: 4rem;
+      }
+      
+      .nav {
+        display: none;
+      }
+      
+      .menu-toggle {
+        display: block;
+      }
+      
+      .footer-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .footer-brand {
+        max-width: 100%;
+      }
+      
+      .feature-boxes {
+        flex-direction: column;
+        align-items: center;
+      }
+      
+      .feature-box {
+        width: 100%;
+        max-width: 400px;
+      }
+    }
+    
+    @media (max-width: 576px) {
+      :root {
+        --font-size-xxl: 2rem;
+        --font-size-xl: 1.5rem;
+        --font-size-lg: 1.25rem;
+        --space-xxl: 3rem;
+      }
+      
+      .btn {
+        width: 100%;
+      }
+      
+      .button-group {
+        flex-direction: column;
+        width: 100%;
+      }
+      
+      .download-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .form-submit {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="container header-container">
+      <a href="#" class="logo">
+        <img src="https://via.placeholder.com/80" alt="GOAT Client Logo" class="logo-img">
+        <span class="logo-text">GOAT CLIENT</span>
+      </a>
+      
+      <nav class="nav">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#download" class="nav-link">Download</a>
+        <a href="#faq" class="nav-link">FAQ</a>
+        <a href="#contact" class="nav-link">Support</a>
+      </nav>
+      
+      <button class="menu-toggle" id="menu-toggle">
+        <span></span>
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      
+      <div class="mobile-nav" id="mobile-nav">
+        <a href="#features" class="mobile-nav-link">Features</a>
+        <a href="#download" class="mobile-nav-link">Download</a>
+        <a href="#faq" class="mobile-nav-link">FAQ</a>
+        <a href="#contact" class="mobile-nav-link">Support</a>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- Hero Section -->
+    <section class="hero">
+      <div class="container hero-container">
+        <div class="hero-content animate-fadeUp">
+          <h1 class="hero-title">Erlebe Minecraft <span class="gradient-text">neu</span></h1>
+          <p class="hero-description">GOAT Client bietet dir verbesserte Grafik, optimierte Performance und exklusive Features für das ultimative Minecraft-Erlebnis.</p>
+          
+          <div class="button-group">
+            <a href="#download" class="btn btn-primary">
+              <span class="btn-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                  <polyline points="7 10 12 15 17 10"/>
+                  <line x1="12" y1="15" x2="12" y2="3"/>
+                </svg>
+              </span>
+              Download
+            </a>
+            <a href="#features" class="btn btn-secondary">Mehr erfahren</a>
+          </div>
+          
+          <div class="feature-boxes">
+            <div class="feature-box animate-fadeUp delay-100">
+              <span class="feature-box-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="m8 3 4 8 5-5 5 15H2L8 3z"></path>
+                </svg>
+              </span>
+              <span class="feature-box-text">Optimierte Performance</span>
+            </div>
+            <div class="feature-box animate-fadeUp delay-200">
+              <span class="feature-box-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 3v2"></path>
+                  <path d="M12 19v2"></path>
+                  <path d="M4.2 4.2l1.4 1.4"></path>
+                  <path d="M18.4 18.4l1.4 1.4"></path>
+                  <path d="M3 12h2"></path>
+                  <path d="M19 12h2"></path>
+                  <path d="M4.2 19.8l1.4-1.4"></path>
+                  <path d="M18.4 5.6l1.4-1.4"></path>
+                  <circle cx="12" cy="12" r="5"></circle>
+                </svg>
+              </span>
+              <span class="feature-box-text">Verbesserte Grafik</span>
+            </div>
+            <div class="feature-box animate-fadeUp delay-300">
+              <span class="feature-box-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 7v6h-6"></path>
+                  <path d="M3 17a9 9 0 0 1 9-9 9 9 0 0 1 9 9 9 9 0 0 1-9 9 9 9 0 0 1-6.3-2.6"></path>
+                  <path d="m12 14 4 4"></path>
+                  <path d="m16 14-4 4"></path>
+                </svg>
+              </span>
+              <span class="feature-box-text">FPS Boost</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="hero-image-container animate-fadeUp delay-200">
+          <img src="https://via.placeholder.com/600x400" alt="GOAT Client Screenshot" class="hero-image">
+        </div>
+      </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="section section-dark" id="features">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Unsere <span class="gradient-text">Features</span></h2>
+          <div class="section-divider"></div>
+          <p class="section-description">GOAT Client bietet dir eine Vielzahl an Features, die dein Spielerlebnis verbessern.</p>
+        </div>
+        
+        <div class="features-grid">
+          <div class="feature-card animate-fadeUp">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Optimierte Performance</h3>
+            <p class="feature-description">
+              Erlebe Minecraft mit höheren FPS und weniger Lags durch unsere optimierte Spiel-Engine.
+            </p>
+          </div>
+          
+          <div class="feature-card animate-fadeUp delay-100">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="5"/>
+                <path d="M12 1v2M12 21v2M4.2 4.2l1.4 1.4M18.4 18.4l1.4 1.4M1 12h2M21 12h2M4.2 19.8l1.4-1.4M18.4 5.6l1.4-1.4"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Verbesserte Grafik</h3>
+            <p class="feature-description">
+              Erlebe Minecraft in neuem Glanz mit unseren HD-Texturen, Shadern und visuellen Verbesserungen.
+            </p>
+          </div>
+          
+          <div class="feature-card animate-fadeUp delay-200">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Hilfreiche Mods</h3>
+            <p class="feature-description">
+              Nutze unsere integrierten Mods für ein besseres Spielerlebnis, ohne einzelne Mods installieren zu müssen.
+            </p>
+          </div>
+          
+          <div class="feature-card animate-fadeUp delay-300">
+            <div class="feature-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                <line x1="8" y1="21" x2="16" y2="21"/>
+                <line x1="12" y1="17" x2="12" y2="21"/>
+              </svg>
+            </div>
+            <h3 class="feature-title">Server Integration</h3>
+            <p class="feature-description">
+              Verbinde dich schnell mit deinen Lieblings-Servern und entdecke neue Server in unserer Server-Liste.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Download Section -->
+    <section class="section section-darker" id="download">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Jetzt <span class="gradient-text">herunterladen</span></h2>
+          <div class="section-divider"></div>
+          <p class="section-description">GOAT Client ist für Windows, macOS und Linux verfügbar.</p>
+        </div>
+        
+        <div class="download-grid">
+          <div class="download-card animate-fadeUp">
+            <div class="download-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect width="14" height="14" x="5" y="5" rx="1" />
+                <path d="m12 5-7 7" />
+                <path d="M5 9V5h4" />
+                <path d="M12 19v-7h-7" />
+                <path d="M19 5v14h-7" />
+              </svg>
+            </div>
+            <h3 class="download-title">Windows</h3>
+            <p class="download-description">Version 1.21.4</p>
+            <a href="#" class="btn btn-primary download-btn">Herunterladen</a>
+          </div>
+          
+          <div class="download-card animate-fadeUp delay-100">
+            <div class="download-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10" />
+                <path d="M17.8 14c.4-1 .6-2 .6-3.1-.1-2.1-.9-4-2.3-5.4-1.4-1.4-3.3-2.3-5.4-2.3-1.1 0-2.2.2-3.1.6" />
+                <path d="M8.6 3.3c2.5 0 4.5 2 4.5 4.5M12 7.8c2.5 0 4.5 2 4.5 4.5" />
+              </svg>
+            </div>
+            <h3 class="download-title">macOS</h3>
+            <p class="download-description">Version 1.21.4</p>
+            <a href="#" class="btn btn-primary download-btn">Herunterladen</a>
+          </div>
+          
+          <div class="download-card animate-fadeUp delay-200">
+            <div class="download-icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="4" y1="9" x2="20" y2="9"/>
+                <line x1="4" y1="15" x2="20" y2="15"/>
+                <line x1="10" y1="3" x2="8" y2="21"/>
+                <line x1="16" y1="3" x2="14" y2="21"/>
+              </svg>
+            </div>
+            <h3 class="download-title">Linux</h3>
+            <p class="download-description">Version 1.21.4</p>
+            <a href="#" class="btn btn-primary download-btn">Herunterladen</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="section section-dark" id="faq">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Häufig gestellte <span class="gradient-text">Fragen</span></h2>
+          <div class="section-divider"></div>
+          <p class="section-description">Hier findest du Antworten auf die häufigsten Fragen zu GOAT Client.</p>
+        </div>
+        
+        <div class="faq-container">
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>Ist GOAT Client kostenlos?</h3>
+              <div class="faq-toggle"></div>
+            </div>
+            <div class="faq-answer">
+              <p>Ja, GOAT Client ist kostenlos verfügbar. Es gibt jedoch einen Premium-Shop für kosmetische Gegenstände wie Skins und Capes, die das Spielerlebnis verbessern, aber keinen spielerischen Vorteil bieten.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>Ist GOAT Client mit allen Minecraft-Versionen kompatibel?</h3>
+              <div class="faq-toggle"></div>
+            </div>
+            <div class="faq-answer">
+              <p>GOAT Client unterstützt aktuell die Minecraft-Versionen 1.8 bis 1.21.4. Wir arbeiten kontinuierlich daran, neue Versionen zu unterstützen, sobald sie veröffentlicht werden.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>Kann ich auf allen Servern mit GOAT Client spielen?</h3>
+              <div class="faq-toggle"></div>
+            </div>
+            <div class="faq-answer">
+              <p>GOAT Client ist mit den meisten Minecraft-Servern kompatibel. Einige Server mit strengen Anti-Cheat-Systemen könnten jedoch Einschränkungen haben. Wir empfehlen, die Serverregeln zu überprüfen.</p>
+            </div>
+          </div>
+          
+          <div class="faq-item">
+            <div class="faq-question">
+              <h3>Kann ich eigene Mods zu GOAT Client hinzufügen?</h3>
+              <div class="faq-toggle"></div>
+            </div>
+            <div class="faq-answer">
+              <p>Ja, GOAT Client ist modular aufgebaut und unterstützt die Installation zusätzlicher Mods. Beachte jedoch, dass wir nur für die im Client integrierten Mods Support anbieten können.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Contact Section -->
+    <section class="section section-darker" id="contact">
+      <div class="container">
+        <div class="section-header">
+          <h2 class="section-title">Kontaktiere <span class="gradient-text">uns</span></h2>
+          <div class="section-divider"></div>
+          <p class="section-description">Hast du Fragen oder Feedback? Wir helfen dir gerne weiter.</p>
+        </div>
+        
+        <div class="contact-container">
+          <div class="contact-info">
+            <div class="contact-item animate-fadeUp">
+              <div class="contact-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                  <polyline points="22,6 12,13 2,6"/>
+                </svg>
+              </div>
+              <div class="contact-text">
+                <h3>E-Mail</h3>
+                <p>support@goat-client.de</p>
+              </div>
+            </div>
+            
+            <div class="contact-item animate-fadeUp delay-100">
+              <div class="contact-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+                </svg>
+              </div>
+              <div class="contact-text">
+                <h3>Discord</h3>
+                <p>discord.gg/goat-client</p>
+              </div>
+            </div>
+            
+            <div class="contact-item animate-fadeUp delay-200">
+              <div class="contact-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+                </svg>
+              </div>
+              <div class="contact-text">
+                <h3>Twitter</h3>
+                <p>@GOATClientMC</p>
+              </div>
+            </div>
+          </div>
+          
+          <div class="contact-form animate-fadeUp delay-100">
+            <form id="contact-form">
+              <div class="form-group">
+                <label for="name" class="form-label">Name</label>
+                <input type="text" id="name" class="form-input" placeholder="Dein Name" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="email" class="form-label">E-Mail</label>
+                <input type="email" id="email" class="form-input" placeholder="Deine E-Mail" required>
+              </div>
+              
+              <div class="form-group">
+                <label for="message" class="form-label">Nachricht</label>
+                <textarea id="message" class="form-textarea" placeholder="Deine Nachricht" required></textarea>
+              </div>
+              
+              <button type="submit" class="btn btn-primary form-submit">Nachricht senden</button>
+            </form>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <img src="https://via.placeholder.com/80" alt="GOAT Client Logo" class="footer-logo">
+          <p class="footer-description">
+            GOAT Client ist ein modifizierter Minecraft-Client, der von leidenschaftlichen Spielern für Spieler entwickelt wurde.
+          </p>
+        </div>
+        
+        <div class="footer-column">
+          <h3 class="footer-heading">Erkunden</h3>
+          <div class="footer-links">
+            <a href="#features" class="footer-link">Features</a>
+            <a href="#download" class="footer-link">Download</a>
+            <a href="#faq" class="footer-link">FAQ</a>
+            <a href="#contact" class="footer-link">Kontakt</a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3 class="footer-heading">Rechtliches</h3>
+          <div class="footer-links">
+            <a href="#" class="footer-link">Impressum</a>
+            <a href="#" class="footer-link">Datenschutz</a>
+            <a href="#" class="footer-link">Nutzungsbedingungen</a>
+          </div>
+        </div>
+        
+        <div class="footer-column">
+          <h3 class="footer-heading">Folge uns</h3>
+          <div class="social-links">
+            <a href="#" class="social-link">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M23 3a10.9 10.9 0 0 1-3.14 1.53 4.48 4.48 0 0 0-7.86 3v1A10.66 10.66 0 0 1 3 4s-4 9 5 13a11.64 11.64 0 0 1-7 2c9 5 20 0 20-11.5a4.5 4.5 0 0 0-.08-.83A7.72 7.72 0 0 0 23 3z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+              </svg>
+            </a>
+            <a href="#" class="social-link">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/>
+                <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <p class="copyright">
+          &copy; <span id="current-year"></span> GOAT Client. Alle Rechte vorbehalten. Nicht mit Mojang assoziiert.
+        </p>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Mobile Menu Toggle
+    const menuToggle = document.getElementById('menu-toggle');
+    const mobileNav = document.getElementById('mobile-nav');
+    const header = document.getElementById('header');
+    
+    menuToggle.addEventListener('click', function() {
+      this.classList.toggle('active');
+      mobileNav.classList.toggle('active');
+    });
+    
+    // Close mobile menu when clicking on a link
+    const mobileNavLinks = document.querySelectorAll('.mobile-nav-link');
+    mobileNavLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        menuToggle.classList.remove('active');
+        mobileNav.classList.remove('active');
+      });
+    });
+    
+    // Header scroll effect
+    window.addEventListener('scroll', function() {
+      if (window.scrollY > 10) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+    
+    // FAQ Accordion
+    const faqItems = document.querySelectorAll('.faq-item');
+    
+    faqItems.forEach(item => {
+      const question = item.querySelector('.faq-question');
+      
+      question.addEventListener('click', () => {
+        item.classList.toggle('active');
+        
+        // Close other accordions
+        faqItems.forEach(otherItem => {
+          if (otherItem !== item) {
+            otherItem.classList.remove('active');
+          }
+        });
+      });
+    });
+    
+    // Handle form submission
+    const contactForm = document.getElementById('contact-form');
+    
+    contactForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      
+      // Get form values
+      const name = document.getElementById('name').value;
+      const email = document.getElementById('email').value;
+      const message = document.getElementById('message').value;
+      
+      // Here you would normally send the form data to your server
+      // For this example, we'll just show an alert
+      alert(`Danke für deine Nachricht, ${name}! Wir werden uns bald bei dir melden.`);
+      
+      // Reset form
+      contactForm.reset();
+    });
+    
+    // Set current year in copyright
+    document.getElementById('current-year').textContent = new Date().getFullYear();
+    
+    // Animate on scroll
+    document.addEventListener('DOMContentLoaded', function() {
+      const animatedElements = document.querySelectorAll('.animate-fadeUp');
+      
+      const checkIfInView = () => {
+        const windowHeight = window.innerHeight;
+        const windowTopPosition = window.scrollY;
+        const windowBottomPosition = windowTopPosition + windowHeight;
+        
+        animatedElements.forEach(element => {
+          const elementHeight = element.offsetHeight;
+          const elementTopPosition = element.offsetTop;
+          const elementBottomPosition = elementTopPosition + elementHeight;
+          
+          // Check if element is in viewport
+          if (
+            elementBottomPosition >= windowTopPosition && 
+            elementTopPosition <= windowBottomPosition
+          ) {
+            element.style.opacity = '1';
+          }
+        });
+      };
+      
+      // Initial check on page load
+      checkIfInView();
+      
+      // Check on scroll
+      window.addEventListener('scroll', checkIfInView);
+    });
+  </script>
+</body>
+</html>
