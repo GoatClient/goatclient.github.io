@@ -1,0 +1,1499 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Goat Client - Minecraft Server Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Reset und Basisstile */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #171717;
+      color: #fff;
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    /* Globales Layout */
+    .container {
+      width: 100%;
+      padding: 0 20px;
+      margin: 0 auto;
+      max-width: 1200px;
+    }
+
+    section {
+      padding: 60px 0;
+    }
+
+    @media (max-width: 768px) {
+      section {
+        padding: 40px 0;
+      }
+    }
+
+    /* Header */
+    header {
+      background-color: rgba(30, 30, 30, 0.98);
+      position: fixed;
+      width: 100%;
+      z-index: 1000;
+      top: 0;
+      left: 0;
+      padding: 15px 0;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    }
+
+    .header-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+    }
+
+    .logo-img {
+      width: 40px;
+      height: 40px;
+      border-radius: 8px;
+    }
+
+    .logo-text {
+      font-weight: 700;
+      font-size: 1.5rem;
+      background: linear-gradient(135deg, #ff7700, #ff9500);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .nav-toggle {
+      display: none;
+      background: none;
+      border: none;
+      color: #fff;
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .main-nav {
+      display: flex;
+      gap: 30px;
+    }
+
+    .nav-link {
+      color: #e0e0e0;
+      text-decoration: none;
+      font-weight: 500;
+      transition: all 0.2s ease;
+      position: relative;
+      padding: 5px 0;
+    }
+
+    .nav-link:hover {
+      color: #ff7700;
+    }
+
+    .nav-link::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background-color: #ff7700;
+      transform: scaleX(0);
+      transition: transform 0.3s ease;
+    }
+
+    .nav-link:hover::after {
+      transform: scaleX(1);
+    }
+
+    .cta-button {
+      background: linear-gradient(135deg, #ff7700, #ff9500);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 10px 20px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .cta-button:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(255, 119, 0, 0.3);
+    }
+
+    .cta-button.secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .cta-button.secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+
+    @media (max-width: 768px) {
+      .nav-toggle {
+        display: block;
+      }
+
+      .main-nav {
+        position: fixed;
+        top: 70px;
+        left: 0;
+        width: 100%;
+        background-color: #1e1e1e;
+        flex-direction: column;
+        padding: 20px;
+        gap: 20px;
+        transform: translateY(-100%);
+        opacity: 0;
+        transition: all 0.3s ease;
+        pointer-events: none;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+
+      .main-nav.active {
+        transform: translateY(0);
+        opacity: 1;
+        pointer-events: all;
+      }
+
+      .nav-link {
+        display: block;
+        padding: 10px 0;
+        font-size: 1.1rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+    }
+
+    /* Hero Sektion */
+    .hero {
+      padding: 140px 0 80px;
+      background-color: #1a1a1a;
+      background-image: linear-gradient(rgba(20, 20, 20, 0.8), rgba(20, 20, 20, 0.9)), url('https://via.placeholder.com/1920x1080?text=Minecraft+Server');
+      background-size: cover;
+      background-position: center;
+    }
+
+    .hero-content {
+      max-width: 700px;
+    }
+
+    .hero-title {
+      font-size: 3.5rem;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .hero-subtitle {
+      font-size: 1.25rem;
+      color: #e0e0e0;
+      margin-bottom: 30px;
+      font-weight: 400;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 15px;
+      margin-top: 30px;
+    }
+
+    @media (max-width: 768px) {
+      .hero {
+        padding: 120px 0 60px;
+        text-align: center;
+      }
+
+      .hero-title {
+        font-size: 2.5rem;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+      }
+    }
+
+    /* Features Sektion */
+    .section-title {
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 15px;
+      text-align: center;
+      color: white;
+    }
+
+    .section-subtitle {
+      font-size: 1.1rem;
+      color: #b0b0b0;
+      margin-bottom: 50px;
+      text-align: center;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 50px;
+    }
+
+    .feature-card {
+      background-color: #232323;
+      border-radius: 12px;
+      padding: 30px;
+      transition: all 0.3s ease;
+      height: 100%;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .feature-icon {
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #ff7700;
+      background: linear-gradient(135deg, #ff7700, #ff9500);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .feature-title {
+      font-size: 1.4rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+      color: white;
+    }
+
+    .feature-description {
+      color: #b0b0b0;
+      font-size: 1rem;
+    }
+
+    @media (max-width: 992px) {
+      .features-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .section-title {
+        font-size: 1.8rem;
+      }
+    }
+
+    /* Dashboard Preview */
+    .dashboard-preview {
+      background-color: #121212;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .dashboard-content {
+      display: flex;
+      align-items: center;
+      gap: 50px;
+    }
+
+    .dashboard-text {
+      flex: 1;
+    }
+
+    .dashboard-image {
+      flex: 1;
+      position: relative;
+    }
+
+    .dashboard-img {
+      width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+      transform: perspective(1000px) rotateY(-5deg) rotateX(5deg);
+      transition: all 0.5s ease;
+    }
+
+    .dashboard-img:hover {
+      transform: perspective(1000px) rotateY(0) rotateX(0);
+    }
+
+    .glow {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 119, 0, 0.1), transparent 70%);
+      pointer-events: none;
+    }
+
+    @media (max-width: 992px) {
+      .dashboard-content {
+        flex-direction: column;
+      }
+
+      .dashboard-text {
+        text-align: center;
+      }
+
+      .dashboard-image {
+        margin-top: 30px;
+      }
+    }
+
+    /* Testimonials */
+    .testimonials {
+      background-color: #1a1a1a;
+    }
+
+    .testimonials-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+    }
+
+    .testimonial-card {
+      background-color: #232323;
+      border-radius: 12px;
+      padding: 30px;
+      position: relative;
+    }
+
+    .testimonial-content {
+      margin-bottom: 20px;
+      color: #e0e0e0;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .author-avatar {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .author-name {
+      font-weight: 600;
+      color: white;
+    }
+
+    .author-role {
+      font-size: 0.875rem;
+      color: #b0b0b0;
+    }
+
+    .quote-icon {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      font-size: 3rem;
+      opacity: 0.1;
+      color: #ff7700;
+    }
+
+    @media (max-width: 992px) {
+      .testimonials-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .testimonials-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Pricing */
+    .pricing-section {
+      background-color: #121212;
+    }
+
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 50px;
+    }
+
+    .pricing-card {
+      background-color: #232323;
+      border-radius: 12px;
+      padding: 30px;
+      text-align: center;
+      transition: all 0.3s ease;
+    }
+
+    .pricing-card.featured {
+      background: linear-gradient(180deg, #2a2a2a, #1e1e1e);
+      border: 2px solid #ff7700;
+      transform: scale(1.05);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    }
+
+    .pricing-card:hover {
+      transform: translateY(-10px);
+    }
+
+    .pricing-card.featured:hover {
+      transform: translateY(-10px) scale(1.05);
+    }
+
+    .pricing-header {
+      margin-bottom: 20px;
+    }
+
+    .pricing-name {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: white;
+      margin-bottom: 10px;
+    }
+
+    .pricing-price {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: #ff7700;
+      margin-bottom: 5px;
+    }
+
+    .pricing-duration {
+      color: #b0b0b0;
+      font-size: 0.9rem;
+    }
+
+    .pricing-features {
+      list-style: none;
+      margin: 25px 0;
+      text-align: left;
+    }
+
+    .pricing-feature {
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      display: flex;
+      align-items: center;
+      color: #e0e0e0;
+    }
+
+    .pricing-feature i {
+      color: #ff7700;
+      margin-right: 10px;
+    }
+
+    .pricing-feature.disabled {
+      color: #666;
+      text-decoration: line-through;
+    }
+
+    .pricing-feature.disabled i {
+      color: #666;
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: -15px;
+      right: 20px;
+      background: linear-gradient(135deg, #ff7700, #ff9500);
+      color: white;
+      padding: 5px 15px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border-radius: 20px;
+      box-shadow: 0 5px 10px rgba(255, 119, 0, 0.3);
+    }
+
+    @media (max-width: 992px) {
+      .pricing-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .pricing-card.featured {
+        grid-column: span 2;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .pricing-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .pricing-card.featured {
+        grid-column: auto;
+      }
+
+      .pricing-card {
+        max-width: 400px;
+        margin: 0 auto;
+      }
+    }
+
+    /* CTA Section */
+    .cta-section {
+      background: linear-gradient(135deg, rgba(255, 119, 0, 0.1), rgba(255, 149, 0, 0.05));
+      text-align: center;
+      padding: 80px 0;
+    }
+
+    .cta-title {
+      font-size: 2.5rem;
+      font-weight: 700;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .cta-description {
+      font-size: 1.2rem;
+      color: #e0e0e0;
+      margin-bottom: 30px;
+      max-width: 700px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .cta-buttons {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .cta-title {
+        font-size: 2rem;
+      }
+
+      .cta-buttons {
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .cta-section {
+        padding: 60px 0;
+      }
+    }
+
+    /* Footer */
+    footer {
+      background-color: #1a1a1a;
+      padding: 60px 0 30px;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 40px;
+      margin-bottom: 40px;
+    }
+
+    .footer-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 20px;
+    }
+
+    .footer-about {
+      color: #b0b0b0;
+      margin-bottom: 20px;
+    }
+
+    .social-links {
+      display: flex;
+      gap: 15px;
+    }
+
+    .social-link {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background-color: #232323;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #e0e0e0;
+      transition: all 0.3s ease;
+    }
+
+    .social-link:hover {
+      background-color: #ff7700;
+      color: white;
+      transform: translateY(-3px);
+    }
+
+    .footer-title {
+      font-size: 1.2rem;
+      font-weight: 600;
+      margin-bottom: 20px;
+      color: white;
+    }
+
+    .footer-links {
+      list-style: none;
+    }
+
+    .footer-link {
+      margin-bottom: 10px;
+    }
+
+    .footer-link a {
+      color: #b0b0b0;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .footer-link a:hover {
+      color: #ff7700;
+      padding-left: 5px;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 20px;
+      display: flex;
+      justify-content: space-between;
+      color: #777;
+      font-size: 0.9rem;
+    }
+
+    .footer-bottom a {
+      color: #b0b0b0;
+      text-decoration: none;
+    }
+
+    .footer-bottom a:hover {
+      color: #ff7700;
+    }
+
+    @media (max-width: 992px) {
+      .footer-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 768px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+      }
+
+      .footer-bottom {
+        flex-direction: column;
+        gap: 10px;
+        align-items: center;
+        text-align: center;
+      }
+    }
+
+    /* Server-Preview Sektion */
+    .server-preview {
+      background-color: #1a1a1a;
+      padding: 80px 0;
+      overflow: hidden;
+    }
+
+    .server-cards {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px 0;
+      margin: 40px 0;
+      scrollbar-width: thin;
+      scrollbar-color: #ff7700 #333;
+    }
+
+    .server-cards::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .server-cards::-webkit-scrollbar-track {
+      background: #333;
+      border-radius: 4px;
+    }
+
+    .server-cards::-webkit-scrollbar-thumb {
+      background: #ff7700;
+      border-radius: 4px;
+    }
+
+    .server-card {
+      min-width: 300px;
+      background-color: #232323;
+      border-radius: 12px;
+      padding: 20px;
+      flex: 0 0 auto;
+      transition: all 0.3s ease;
+    }
+
+    .server-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .server-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 15px;
+    }
+
+    .server-status {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .online {
+      background-color: #4caf50;
+      box-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+    }
+
+    .offline {
+      background-color: #f44336;
+      box-shadow: 0 0 8px rgba(244, 67, 54, 0.5);
+    }
+
+    .status-text {
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+
+    .server-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: white;
+    }
+
+    .server-address {
+      font-size: 0.9rem;
+      color: #b0b0b0;
+      margin-bottom: 15px;
+    }
+
+    .server-stats {
+      display: flex;
+      justify-content: space-between;
+      background-color: #1a1a1a;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 15px;
+    }
+
+    .stat {
+      text-align: center;
+    }
+
+    .stat-value {
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: white;
+    }
+
+    .stat-label {
+      font-size: 0.8rem;
+      color: #b0b0b0;
+      text-transform: uppercase;
+    }
+
+    .server-actions {
+      display: flex;
+      gap: 10px;
+    }
+
+    .server-action {
+      flex: 1;
+      padding: 8px;
+      border-radius: 6px;
+      border: none;
+      background-color: #2c2c2c;
+      color: #e0e0e0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+    }
+
+    .server-action:hover {
+      background-color: #3a3a3a;
+    }
+
+    .primary-action {
+      background-color: rgba(255, 119, 0, 0.2);
+      color: #ff7700;
+    }
+
+    .primary-action:hover {
+      background-color: rgba(255, 119, 0, 0.3);
+    }
+
+    /* Animation für das Ratschen */
+    @keyframes scrollHint {
+      0%, 100% { transform: translateX(0); }
+      50% { transform: translateX(10px); }
+    }
+
+    .scroll-hint {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 20px;
+      color: #777;
+      font-size: 0.9rem;
+    }
+
+    .scroll-hint i {
+      margin-left: 5px;
+      animation: scrollHint 1.5s ease-in-out infinite;
+    }
+
+    /* Mobile-spezifische Anpassungen */
+    @media (max-width: 480px) {
+      .hero-title {
+        font-size: 2rem;
+      }
+
+      .section-title {
+        font-size: 1.5rem;
+      }
+
+      .cta-title {
+        font-size: 1.8rem;
+      }
+
+      .server-card {
+        min-width: 260px;
+      }
+    }
+
+    /* For the mobile nav */
+    .mobile-nav-active {
+      overflow: hidden;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="container header-container">
+      <a href="#" class="logo">
+        <img src="https://via.placeholder.com/80/ff7700/ffffff?text=G" alt="Goat Client Logo" class="logo-img">
+        <span class="logo-text">Goat Client</span>
+      </a>
+      
+      <button class="nav-toggle" id="navToggle">
+        <i class="fas fa-bars"></i>
+      </button>
+      
+      <nav class="main-nav" id="mainNav">
+        <a href="#features" class="nav-link">Features</a>
+        <a href="#dashboard" class="nav-link">Dashboard</a>
+        <a href="#servers" class="nav-link">Server</a>
+        <a href="#pricing" class="nav-link">Preise</a>
+        <a href="#contact" class="nav-link">Kontakt</a>
+        <a href="#login" class="cta-button secondary">Login</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <section class="hero" id="home">
+    <div class="container">
+      <div class="hero-content">
+        <h1 class="hero-title">Verwalte deine Minecraft-Server einfach & effizient</h1>
+        <p class="hero-subtitle">Mit dem Goat Client hast du volle Kontrolle über deine Minecraft-Server – egal ob du von zu Hause oder unterwegs bist. Einfache Verwaltung, Echtzeitüberwachung und optimierte Performance.</p>
+        <div class="hero-buttons">
+          <a href="#pricing" class="cta-button">Jetzt starten</a>
+          <a href="#demo" class="cta-button secondary">Demo ansehen</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2 class="section-title">Warum Goat Client?</h2>
+      <p class="section-subtitle">Unser Tool bietet alles, was du für die Verwaltung deiner Minecraft-Server benötigst – übersichtlich, einfach und leistungsstark.</p>
+      
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-tachometer-alt"></i>
+          </div>
+          <h3 class="feature-title">Echtzeitüberwachung</h3>
+          <p class="feature-description">Behalte TPS, RAM-Nutzung und Spielerzahlen im Blick – immer aktuell und übersichtlich auf deinem Dashboard.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-mobile-alt"></i>
+          </div>
+          <h3 class="feature-title">Mobile Kontrolle</h3>
+          <p class="feature-description">Verwalte deine Server von jedem Gerät aus – vollständig optimiert für Smartphone und Tablet.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-terminal"></i>
+          </div>
+          <h3 class="feature-title">Einfache Konsole</h3>
+          <p class="feature-description">Führe Befehle aus, sieh dir Logs an und reagiere sofort auf Probleme – alles in einer übersichtlichen Konsole.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-users"></i>
+          </div>
+          <h3 class="feature-title">Benutzerverwaltung</h3>
+          <p class="feature-description">Teile den Zugriff auf deine Server mit Teammitgliedern und vergib individuelle Berechtigungen.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-shield-alt"></i>
+          </div>
+          <h3 class="feature-title">Sicherheit</h3>
+          <p class="feature-description">Automatische Backups, DDoS-Schutz und sichere Authentifizierung schützen deine Serverdaten.</p>
+        </div>
+        
+        <div class="feature-card">
+          <div class="feature-icon">
+            <i class="fas fa-plug"></i>
+          </div>
+          <h3 class="feature-title">Plugin-Manager</h3>
+          <p class="feature-description">Installiere, aktualisiere und konfiguriere Plugins direkt über die Benutzeroberfläche.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard Preview -->
+  <section class="dashboard-preview" id="dashboard">
+    <div class="container">
+      <div class="dashboard-content">
+        <div class="dashboard-text">
+          <h2 class="section-title">Dein leistungsstarkes Dashboard</h2>
+          <p class="section-subtitle">Alles im Blick mit unserem übersichtlichen und intuitiven Dashboard – optimiert für Desktop und Mobilgeräte.</p>
+          <a href="#demo" class="cta-button">Demo testen</a>
+        </div>
+        
+        <div class="dashboard-image">
+          <img src="https://via.placeholder.com/800x500/2a2a2a/ff7700?text=Server+Dashboard" alt="Dashboard Preview" class="dashboard-img">
+          <div class="glow"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Server Preview -->
+  <section class="server-preview" id="servers">
+    <div class="container">
+      <h2 class="section-title">Deine Server auf einen Blick</h2>
+      <p class="section-subtitle">Alle Informationen deiner Server übersichtlich dargestellt – mit Schnellzugriff auf wichtige Funktionen.</p>
+      
+      <div class="server-cards">
+        <!-- Server 1 -->
+        <div class="server-card">
+          <div class="server-header">
+            <div>
+              <h3 class="server-name">Survival Server</h3>
+              <p class="server-address">survival.goat-client.de</p>
+            </div>
+            <div class="server-status">
+              <div class="status-dot online"></div>
+              <span class="status-text">Online</span>
+            </div>
+          </div>
+          
+          <div class="server-stats">
+            <div class="stat">
+              <div class="stat-value">24/100</div>
+              <div class="stat-label">Spieler</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">19.8</div>
+              <div class="stat-label">TPS</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">3.2GB</div>
+              <div class="stat-label">RAM</div>
+            </div>
+          </div>
+          
+          <div class="server-actions">
+            <button class="server-action">
+              <i class="fas fa-redo"></i>
+            </button>
+            <button class="server-action">
+              <i class="fas fa-stop"></i>
+            </button>
+            <button class="server-action primary-action">
+              <i class="fas fa-cog"></i> Verwalten
+            </button>
+          </div>
+        </div>
+        
+        <!-- Server 2 -->
+        <div class="server-card">
+          <div class="server-header">
+            <div>
+              <h3 class="server-name">Creative Server</h3>
+              <p class="server-address">creative.goat-client.de</p>
+            </div>
+            <div class="server-status">
+              <div class="status-dot online"></div>
+              <span class="status-text">Online</span>
+            </div>
+          </div>
+          
+          <div class="server-stats">
+            <div class="stat">
+              <div class="stat-value">12/50</div>
+              <div class="stat-label">Spieler</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">20.0</div>
+              <div class="stat-label">TPS</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">2.1GB</div>
+              <div class="stat-label">RAM</div>
+            </div>
+          </div>
+          
+          <div class="server-actions">
+            <button class="server-action">
+              <i class="fas fa-redo"></i>
+            </button>
+            <button class="server-action">
+              <i class="fas fa-stop"></i>
+            </button>
+            <button class="server-action primary-action">
+              <i class="fas fa-cog"></i> Verwalten
+            </button>
+          </div>
+        </div>
+        
+        <!-- Server 3 -->
+        <div class="server-card">
+          <div class="server-header">
+            <div>
+              <h3 class="server-name">Minigames</h3>
+              <p class="server-address">minigames.goat-client.de</p>
+            </div>
+            <div class="server-status">
+              <div class="status-dot offline"></div>
+              <span class="status-text">Offline</span>
+            </div>
+          </div>
+          
+          <div class="server-stats">
+            <div class="stat">
+              <div class="stat-value">0/100</div>
+              <div class="stat-label">Spieler</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">--</div>
+              <div class="stat-label">TPS</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">0GB</div>
+              <div class="stat-label">RAM</div>
+            </div>
+          </div>
+          
+          <div class="server-actions">
+            <button class="server-action">
+              <i class="fas fa-play"></i>
+            </button>
+            <button class="server-action" disabled>
+              <i class="fas fa-stop"></i>
+            </button>
+            <button class="server-action primary-action">
+              <i class="fas fa-cog"></i> Verwalten
+            </button>
+          </div>
+        </div>
+        
+        <!-- Server 4 -->
+        <div class="server-card">
+          <div class="server-header">
+            <div>
+              <h3 class="server-name">Skyblock</h3>
+              <p class="server-address">skyblock.goat-client.de</p>
+            </div>
+            <div class="server-status">
+              <div class="status-dot online"></div>
+              <span class="status-text">Online</span>
+            </div>
+          </div>
+          
+          <div class="server-stats">
+            <div class="stat">
+              <div class="stat-value">35/100</div>
+              <div class="stat-label">Spieler</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">19.5</div>
+              <div class="stat-label">TPS</div>
+            </div>
+            <div class="stat">
+              <div class="stat-value">4.8GB</div>
+              <div class="stat-label">RAM</div>
+            </div>
+          </div>
+          
+          <div class="server-actions">
+            <button class="server-action">
+              <i class="fas fa-redo"></i>
+            </button>
+            <button class="server-action">
+              <i class="fas fa-stop"></i>
+            </button>
+            <button class="server-action primary-action">
+              <i class="fas fa-cog"></i> Verwalten
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div class="scroll-hint">
+        Scroll für mehr <i class="fas fa-arrow-right"></i>
+      </div>
+    </div>
+  </section>
+
+  <!-- Testimonials -->
+  <section class="testimonials" id="testimonials">
+    <div class="container">
+      <h2 class="section-title">Was unsere Kunden sagen</h2>
+      <p class="section-subtitle">Erfahre, wie Goat Client Servermanagern das Leben leichter macht.</p>
+      
+      <div class="testimonials-grid">
+        <div class="testimonial-card">
+          <i class="fas fa-quote-right quote-icon"></i>
+          <p class="testimonial-content">„Seit wir Goat Client nutzen, haben wir unsere Server-Downtime um 80% reduziert. Die mobile App ist besonders hilfreich, wenn ich unterwegs bin."</p>
+          <div class="testimonial-author">
+            <img src="https://via.placeholder.com/100/999999/ffffff?text=M" alt="Max Mustermann" class="author-avatar">
+            <div>
+              <div class="author-name">Max Mustermann</div>
+              <div class="author-role">Admin, MineZone Network</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <i class="fas fa-quote-right quote-icon"></i>
+          <p class="testimonial-content">„Die Echtzeit-Überwachung hat uns mehrfach vor Server-Crashes bewahrt. Das beste Tool, das wir je für unsere Server genutzt haben!"</p>
+          <div class="testimonial-author">
+            <img src="https://via.placeholder.com/100/999999/ffffff?text=L" alt="Laura Schmidt" class="author-avatar">
+            <div>
+              <div class="author-name">Laura Schmidt</div>
+              <div class="author-role">Serverbetreiber, CubeCraft</div>
+            </div>
+          </div>
+        </div>
+        
+        <div class="testimonial-card">
+          <i class="fas fa-quote-right quote-icon"></i>
+          <p class="testimonial-content">„Die Benutzeroberfläche ist so intuitiv, dass sogar unsere Moderatoren ohne technische Vorkenntnisse damit umgehen können."</p>
+          <div class="testimonial-author">
+            <img src="https://via.placeholder.com/100/999999/ffffff?text=T" alt="Thomas Weber" class="author-avatar">
+            <div>
+              <div class="author-name">Thomas Weber</div>
+              <div class="author-role">Owner, Fantasy Realms</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing Section -->
+  <section class="pricing-section" id="pricing">
+    <div class="container">
+      <h2 class="section-title">Unsere Pakete</h2>
+      <p class="section-subtitle">Wähle das passende Paket für deine Bedürfnisse. Alle Pläne beinhalten unsere Kernfunktionen.</p>
+      
+      <div class="pricing-grid">
+        <!-- Basic Plan -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <div class="pricing-name">Basic</div>
+            <div class="pricing-price">€9.99</div>
+            <div class="pricing-duration">pro Monat</div>
+          </div>
+          
+          <ul class="pricing-features">
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Bis zu 3 Server
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Echtzeit-Überwachung
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Konsolen-Zugriff
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Mobiler Zugriff
+            </li>
+            <li class="pricing-feature disabled">
+              <i class="fas fa-times"></i> Automatische Backups
+            </li>
+            <li class="pricing-feature disabled">
+              <i class="fas fa-times"></i> Erweiterte Statistiken
+            </li>
+            <li class="pricing-feature disabled">
+              <i class="fas fa-times"></i> Multi-User Zugriff
+            </li>
+          </ul>
+          
+          <a href="#signup" class="cta-button secondary">Jetzt auswählen</a>
+        </div>
+        
+        <!-- Pro Plan -->
+        <div class="pricing-card featured">
+          <div class="featured-badge">Beliebt</div>
+          <div class="pricing-header">
+            <div class="pricing-name">Pro</div>
+            <div class="pricing-price">€19.99</div>
+            <div class="pricing-duration">pro Monat</div>
+          </div>
+          
+          <ul class="pricing-features">
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Bis zu 10 Server
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Echtzeit-Überwachung
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Konsolen-Zugriff
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Mobiler Zugriff
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Automatische Backups
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Erweiterte Statistiken
+            </li>
+            <li class="pricing-feature disabled">
+              <i class="fas fa-times"></i> Multi-User Zugriff
+            </li>
+          </ul>
+          
+          <a href="#signup" class="cta-button">Jetzt auswählen</a>
+        </div>
+        
+        <!-- Enterprise Plan -->
+        <div class="pricing-card">
+          <div class="pricing-header">
+            <div class="pricing-name">Enterprise</div>
+            <div class="pricing-price">€49.99</div>
+            <div class="pricing-duration">pro Monat</div>
+          </div>
+          
+          <ul class="pricing-features">
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Unbegrenzte Server
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Echtzeit-Überwachung
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Konsolen-Zugriff
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Mobiler Zugriff
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Automatische Backups
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Erweiterte Statistiken
+            </li>
+            <li class="pricing-feature">
+              <i class="fas fa-check"></i> Multi-User Zugriff
+            </li>
+          </ul>
+          
+          <a href="#signup" class="cta-button secondary">Jetzt auswählen</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA Section -->
+  <section class="cta-section" id="cta">
+    <div class="container">
+      <h2 class="cta-title">Bereit, deine Server besser zu verwalten?</h2>
+      <p class="cta-description">Starte jetzt mit Goat Client und erlebe, wie einfach Servermanagement sein kann. 14 Tage kostenlos testen, keine Kreditkarte erforderlich.</p>
+      <div class="cta-buttons">
+        <a href="#signup" class="cta-button">Kostenlos starten</a>
+        <a href="#demo" class="cta-button secondary">Demo ansehen</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer id="contact">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="footer-logo">
+            <img src="https://via.placeholder.com/50/ff7700/ffffff?text=G" alt="Goat Client Logo" class="logo-img">
+            <span class="logo-text">Goat Client</span>
+          </div>
+          <p class="footer-about">
+            Goat Client bietet innovative Lösungen für Minecraft-Servermanagement. Unser Ziel ist es, Serverbetreibern das Leben einfacher zu machen.
+          </p>
+          <div class="social-links">
+            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-discord"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-github"></i></a>
+            <a href="#" class="social-link"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+        
+        <div>
+          <h3 class="footer-title">Produkt</h3>
+          <ul class="footer-links">
+            <li class="footer-link"><a href="#features">Features</a></li>
+            <li class="footer-link"><a href="#pricing">Preise</a></li>
+            <li class="footer-link"><a href="#demo">Demo</a></li>
+            <li class="footer-link"><a href="#changelog">Änderungsprotokoll</a></li>
+            <li class="footer-link"><a href="#roadmap">Roadmap</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="footer-title">Support</h3>
+          <ul class="footer-links">
+            <li class="footer-link"><a href="#help">Hilfe-Center</a></li>
+            <li class="footer-link"><a href="#docs">Dokumentation</a></li>
+            <li class="footer-link"><a href="#contact">Kontakt</a></li>
+            <li class="footer-link"><a href="#status">Status</a></li>
+          </ul>
+        </div>
+        
+        <div>
+          <h3 class="footer-title">Unternehmen</h3>
+          <ul class="footer-links">
+            <li class="footer-link"><a href="#about">Über uns</a></li>
+            <li class="footer-link"><a href="#blog">Blog</a></li>
+            <li class="footer-link"><a href="#careers">Karriere</a></li>
+            <li class="footer-link"><a href="#press">Presse</a></li>
+          </ul>
+        </div>
+      </div>
+      
+      <div class="footer-bottom">
+        <div>&copy; 2025 Goat Client. Alle Rechte vorbehalten.</div>
+        <div>
+          <a href="#privacy">Datenschutz</a> &bull;
+          <a href="#terms">Nutzungsbedingungen</a> &bull;
+          <a href="#imprint">Impressum</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- JavaScript -->
+  <script>
+    // Mobile Navigationsmenü
+    const navToggle = document.getElementById('navToggle');
+    const mainNav = document.getElementById('mainNav');
+    
+    navToggle.addEventListener('click', () => {
+      mainNav.classList.toggle('active');
+      document.body.classList.toggle('mobile-nav-active');
+      navToggle.innerHTML = mainNav.classList.contains('active') ? 
+        '<i class="fas fa-times"></i>' : 
+        '<i class="fas fa-bars"></i>';
+    });
+    
+    // Schließe das Menü, wenn auf einen Link geklickt wird
+    const navLinks = document.querySelectorAll('.nav-link');
+    navLinks.forEach(link => {
+      link.addEventListener('click', () => {
+        mainNav.classList.remove('active');
+        document.body.classList.remove('mobile-nav-active');
+        navToggle.innerHTML = '<i class="fas fa-bars"></i>';
+      });
+    });
+    
+    // Smooth Scrolling für Anker-Links
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+      anchor.addEventListener('click', function (e) {
+        e.preventDefault();
+        
+        const target = document.querySelector(this.getAttribute('href'));
+        if (target) {
+          window.scrollTo({
+            top: target.offsetTop - 80,
+            behavior: 'smooth'
+          });
+        }
+      });
+    });
+    
+    // Fixed Header beim Scrollen
+    window.addEventListener('scroll', () => {
+      const header = document.querySelector('header');
+      header.classList.toggle('scrolled', window.scrollY > 10);
+    });
+  </script>
+</body>
+</html>
