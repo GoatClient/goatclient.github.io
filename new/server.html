@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Server Management</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* Globale Stile */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', 'Roboto', -apple-system, BlinkMacSystemFont, sans-serif;
+      background-color: #171717;
+      color: #fff;
+      line-height: 1.6;
+    }
+
+    /* Layout */
+    .page-container {
+      padding: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .page-title {
+      font-size: 2rem;
+      font-weight: 600;
+      margin-bottom: 1.5rem;
+      color: #fff;
+      position: relative;
+      padding-bottom: 0.5rem;
+    }
+
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background-color: #ff7700;
+      border-radius: 2px;
+    }
+
+    .section {
+      margin-bottom: 2rem;
+    }
+
+    /* Cards */
+    .content-card {
+      background-color: #1e1e1e;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .content-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #fff;
+    }
+
+    /* Buttons */
+    .primary-button {
+      background: linear-gradient(135deg, #ff7700, #ff9500);
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 4px 10px rgba(255, 119, 0, 0.2);
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .primary-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba(255, 119, 0, 0.3);
+    }
+
+    .secondary-button {
+      background-color: #2a2a2a;
+      color: #e0e0e0;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .secondary-button:hover {
+      background-color: #333;
+      transform: translateY(-2px);
+    }
+
+    .danger-button {
+      background-color: #dc2626;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      padding: 0.75rem 1.5rem;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .danger-button:hover {
+      background-color: #b91c1c;
+    }
+
+    .danger-button:disabled {
+      background-color: #7f1d1d;
+      opacity: 0.7;
+      cursor: not-allowed;
+    }
+
+    .button-icon {
+      margin-right: 0.5rem;
+    }
+
+    /* Forms */
+    .form-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #d0d0d0;
+    }
+
+    .form-input {
+      width: 100%;
+      background-color: #232323;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 0.75rem;
+      color: #fff;
+      font-size: 1rem;
+      transition: all 0.2s ease;
+    }
+
+    .form-input:focus {
+      border-color: #ff7700;
+      box-shadow: 0 0 0 2px rgba(255, 119, 0, 0.2);
+      outline: none;
+    }
+
+    /* Server Management spezifische Stile */
+    .server-status-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .server-status-grid {
+      display: grid;
+      gap: 1rem;
+    }
+
+    .server-status-card {
+      display: grid;
+      grid-template-columns: auto 1fr auto auto;
+      align-items: center;
+      gap: 1.5rem;
+      background-color: #232323;
+      border-radius: 10px;
+      padding: 1.25rem;
+      transition: all 0.3s ease;
+    }
+
+    .server-status-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .server-status-card.offline {
+      opacity: 0.8;
+      background-color: #1e1e1e;
+    }
+
+    .server-status-indicator {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .status-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    .status-dot.online {
+      background-color: #22c55e;
+      box-shadow: 0 0 8px rgba(34, 197, 94, 0.5);
+    }
+
+    .status-dot.offline {
+      background-color: #6c757d;
+    }
+
+    .server-status-text {
+      font-size: 0.85rem;
+      font-weight: 500;
+    }
+
+    .server-info {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .server-name {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .server-address {
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+
+    .server-metrics {
+      display: flex;
+      gap: 1.5rem;
+    }
+
+    .metric {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .metric-value {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .metric-label {
+      font-size: 0.75rem;
+      color: #9ca3af;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .server-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .action-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #2c2c2c;
+      border: none;
+      color: #e0e0e0;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .action-button:hover {
+      background-color: #3a3a3a;
+      transform: translateY(-2px);
+    }
+
+    .action-button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .action-button.danger:hover {
+      background-color: #dc2626;
+      color: white;
+    }
+
+    /* Tabs */
+    .tabs-container {
+      margin-bottom: 2rem;
+    }
+
+    .tabs-nav {
+      display: flex;
+      border-bottom: 1px solid #333;
+      margin-bottom: 1.5rem;
+    }
+
+    .tab-item {
+      padding: 0.75rem 1.5rem;
+      cursor: pointer;
+      position: relative;
+      color: #8a8a8a;
+      transition: all 0.2s ease;
+    }
+
+    .tab-item:after {
+      content: '';
+      position: absolute;
+      bottom: -1px;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background-color: #ff7700;
+      transform: scaleX(0);
+      transition: transform 0.2s ease;
+    }
+
+    .tab-item.active {
+      color: #fff;
+    }
+
+    .tab-item.active:after {
+      transform: scaleX(1);
+    }
+
+    .tab-item:hover {
+      color: #fff;
+    }
+
+    .tab-content {
+      margin-top: 1.5rem;
+    }
+
+    /* Activities tab */
+    .activity-filters {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .activity-filters .form-group {
+      width: 200px;
+      margin-bottom: 0;
+    }
+
+    .activity-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .activity-item {
+      display: grid;
+      grid-template-columns: 80px auto 1fr;
+      align-items: center;
+      gap: 1rem;
+      padding: 0.75rem;
+      border-radius: 8px;
+      background-color: #232323;
+      transition: all 0.2s ease;
+    }
+
+    .activity-item:hover {
+      background-color: #2c2c2c;
+    }
+
+    .activity-time {
+      font-size: 0.875rem;
+      color: #9ca3af;
+    }
+
+    .activity-icon {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .activity-icon.info {
+      background-color: rgba(59, 130, 246, 0.15);
+      color: #60a5fa;
+    }
+
+    .activity-icon.warning {
+      background-color: rgba(245, 158, 11, 0.15);
+      color: #fbbf24;
+    }
+
+    .activity-icon.error {
+      background-color: rgba(220, 38, 38, 0.15);
+      color: #f87171;
+    }
+
+    .activity-icon.success {
+      background-color: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+    }
+
+    .activity-details {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .activity-server {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: #e0e0e0;
+    }
+
+    .activity-message {
+      font-size: 0.875rem;
+      color: #d1d5db;
+    }
+
+    /* Console tab */
+    .console-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .console-header .form-group {
+      width: 200px;
+      margin-bottom: 0;
+    }
+
+    .console-actions {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .console-output {
+      height: 320px;
+      background-color: #161616;
+      border-radius: 8px;
+      padding: 1rem;
+      overflow-y: auto;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 0.875rem;
+      margin-bottom: 1rem;
+      scrollbar-width: thin;
+      scrollbar-color: #444 #161616;
+    }
+
+    .console-output::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    .console-output::-webkit-scrollbar-track {
+      background: #161616;
+    }
+
+    .console-output::-webkit-scrollbar-thumb {
+      background-color: #444;
+      border-radius: 4px;
+    }
+
+    .console-lines {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .console-line {
+      white-space: pre-wrap;
+      word-break: break-all;
+      color: #d1d5db;
+    }
+
+    .log-info {
+      color: #93c5fd;
+    }
+
+    .log-warning {
+      color: #fcd34d;
+    }
+
+    .log-error {
+      color: #f87171;
+    }
+
+    .console-input {
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .console-input .form-input {
+      flex-grow: 1;
+    }
+
+    /* Performance tab */
+    .performance-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .time-range-selector {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .time-range-button {
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      background-color: #232323;
+      border: none;
+      color: #d1d5db;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .time-range-button:hover {
+      background-color: #2d2d2d;
+    }
+
+    .time-range-button.active {
+      background-color: #ff7700;
+      color: white;
+    }
+
+    .performance-graphs {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    .performance-chart {
+      padding: 1rem;
+    }
+
+    .chart-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+      color: #e0e0e0;
+    }
+
+    .chart-container {
+      height: 200px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chart-placeholder {
+      color: #6b7280;
+      font-style: italic;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.7);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      backdrop-filter: blur(4px);
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-container {
+      width: 500px;
+      max-width: 90vw;
+      max-height: 90vh;
+      background-color: #232323;
+      border-radius: 12px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid #333;
+    }
+
+    .modal-title {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: #9ca3af;
+      cursor: pointer;
+      font-size: 1.25rem;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close:hover {
+      color: #fff;
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+      overflow-y: auto;
+      max-height: 60vh;
+    }
+
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 1rem;
+      padding: 1.25rem 1.5rem;
+      border-top: 1px solid #333;
+    }
+
+    /* RAM Slider */
+    .ram-slider-container {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .ram-slider {
+      flex-grow: 1;
+      height: 8px;
+      -webkit-appearance: none;
+      appearance: none;
+      background: #333;
+      border-radius: 4px;
+      outline: none;
+    }
+
+    .ram-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #ff7700;
+      cursor: pointer;
+    }
+
+    .ram-value {
+      min-width: 60px;
+      text-align: right;
+      font-weight: 600;
+      color: #e0e0e0;
+    }
+
+    /* Delete Modal */
+    .delete-modal {
+      max-width: 550px;
+    }
+
+    .delete-warning {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .warning-icon {
+      font-size: 3rem;
+      color: #f59e0b;
+      margin-bottom: 0.5rem;
+    }
+
+    .warning-text {
+      color: #9ca3af;
+      font-size: 0.875rem;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 768px) {
+      .server-status-card {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      
+      .server-metrics {
+        justify-content: space-around;
+        width: 100%;
+      }
+      
+      .server-actions {
+        justify-content: flex-end;
+        width: 100%;
+      }
+      
+      .performance-graphs {
+        grid-template-columns: 1fr;
+      }
+      
+      .activity-item {
+        grid-template-columns: 60px auto 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <h1 class="page-title">Server Management</h1>
+    
+    <!-- Server Status Übersicht -->
+    <div class="section">
+      <div class="content-card">
+        <div class="server-status-header">
+          <h2 class="card-title">Server Status</h2>
+          <div class="actions">
+            <button class="secondary-button">
+              <i class="fas fa-sync button-icon"></i>
+              Aktualisieren
+            </button>
+            <button class="primary-button" onclick="document.getElementById('addServerModal').classList.add('active')">
+              <i class="fas fa-plus button-icon"></i>
+              Server hinzufügen
+            </button>
+          </div>
+        </div>
+        
+        <div class="server-status-grid">
+          <!-- Online Server -->
+          <div class="server-status-card">
+            <div class="server-status-indicator">
+              <div class="status-dot online"></div>
+              <span class="server-status-text">Online</span>
+            </div>
+            
+            <div class="server-info">
+              <div class="server-name">Survival Server</div>
+              <div class="server-address">survival.goat-client.de</div>
+            </div>
+            
+            <div class="server-metrics">
+              <div class="metric">
+                <div class="metric-value">24/100</div>
+                <div class="metric-label">Spieler</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">19.8</div>
+                <div class="metric-label">TPS</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">3.2GB/8GB</div>
+                <div class="metric-label">RAM</div>
+              </div>
+            </div>
+            
+            <div class="server-actions">
+              <button class="action-button" title="Neustart">
+                <i class="fas fa-redo"></i>
+              </button>
+              <button class="action-button" title="Stoppen">
+                <i class="fas fa-stop"></i>
+              </button>
+              <button class="action-button" disabled title="Starten">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="action-button" title="Konfigurieren">
+                <i class="fas fa-cog"></i>
+              </button>
+              <button class="action-button danger" title="Löschen" onclick="document.getElementById('deleteServerModal').classList.add('active')">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Another Online Server -->
+          <div class="server-status-card">
+            <div class="server-status-indicator">
+              <div class="status-dot online"></div>
+              <span class="server-status-text">Online</span>
+            </div>
+            
+            <div class="server-info">
+              <div class="server-name">Creative Server</div>
+              <div class="server-address">creative.goat-client.de</div>
+            </div>
+            
+            <div class="server-metrics">
+              <div class="metric">
+                <div class="metric-value">12/50</div>
+                <div class="metric-label">Spieler</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">20.0</div>
+                <div class="metric-label">TPS</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">2.1GB/4GB</div>
+                <div class="metric-label">RAM</div>
+              </div>
+            </div>
+            
+            <div class="server-actions">
+              <button class="action-button" title="Neustart">
+                <i class="fas fa-redo"></i>
+              </button>
+              <button class="action-button" title="Stoppen">
+                <i class="fas fa-stop"></i>
+              </button>
+              <button class="action-button" disabled title="Starten">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="action-button" title="Konfigurieren">
+                <i class="fas fa-cog"></i>
+              </button>
+              <button class="action-button danger" title="Löschen">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+          
+          <!-- Offline Server -->
+          <div class="server-status-card offline">
+            <div class="server-status-indicator">
+              <div class="status-dot offline"></div>
+              <span class="server-status-text">Offline</span>
+            </div>
+            
+            <div class="server-info">
+              <div class="server-name">Minigames</div>
+              <div class="server-address">minigames.goat-client.de</div>
+            </div>
+            
+            <div class="server-metrics">
+              <div class="metric">
+                <div class="metric-value">0/100</div>
+                <div class="metric-label">Spieler</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">--</div>
+                <div class="metric-label">TPS</div>
+              </div>
+              <div class="metric">
+                <div class="metric-value">0GB/8GB</div>
+                <div class="metric-label">RAM</div>
+              </div>
+            </div>
+            
+            <div class="server-actions">
+              <button class="action-button" disabled title="Neustart">
+                <i class="fas fa-redo"></i>
+              </button>
+              <button class="action-button" disabled title="Stoppen">
+                <i class="fas fa-stop"></i>
+              </button>
+              <button class="action-button" title="Starten">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="action-button" title="Konfigurieren">
+                <i class="fas fa-cog"></i>
+              </button>
+              <button class="action-button danger" title="Löschen">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Server-Aktivitäten und Logs -->
+    <div class="section">
+      <div class="content-card">
+        <div class="tabs-container">
+          <div class="tabs-nav">
+            <div class="tab-item active" onclick="switchTab(this, 'aktivitäten')">Aktivitäten</div>
+            <div class="tab-item" onclick="switchTab(this, 'konsole')">Konsole</div>
+            <div class="tab-item" onclick="switchTab(this, 'leistung')">Leistung</div>
+          </div>
+          
+          <div class="tab-content">
+            <!-- Aktivitäten Tab -->
+            <div id="aktivitäten" class="activities-container">
+              <div class="activity-filters">
+                <div class="form-group">
+                  <select class="form-input">
+                    <option value="all">Alle Server</option>
+                    <option value="1">Survival Server</option>
+                    <option value="2">Creative Server</option>
+                    <option value="3">Minigames</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <select class="form-input">
+                    <option value="all">Alle Aktivitäten</option>
+                    <option value="system">System</option>
+                    <option value="login">Logins</option>
+                    <option value="errors">Fehler</option>
+                  </select>
+                </div>
+              </div>
+              
+              <div class="activity-list">
+                <div class="activity-item">
+                  <div class="activity-time">10:25</div>
+                  <div class="activity-icon info">
+                    <i class="fas fa-info-circle"></i>
+                  </div>
+                  <div class="activity-details">
+                    <div class="activity-server">Survival Server</div>
+                    <div class="activity-message">Server gestartet</div>
+                  </div>
+                </div>
+                
+                <div class="activity-item">
+                  <div class="activity-time">10:20</div>
+                  <div class="activity-icon warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                  </div>
+                  <div class="activity-details">
+                    <div class="activity-server">Minigames</div>
+                    <div class="activity-message">Hohe RAM-Nutzung (90%)</div>
+                  </div>
+                </div>
+                
+                <div class="activity-item">
+                  <div class="activity-time">10:15</div>
+                  <div class="activity-icon error">
+                    <i class="fas fa-times-circle"></i>
+                  </div>
+                  <div class="activity-details">
+                    <div class="activity-server">Minigames</div>
+                    <div class="activity-message">Server unerwartet beendet</div>
+                  </div>
+                </div>
+                
+                <div class="activity-item">
+                  <div class="activity-time">10:10</div>
+                  <div class="activity-icon success">
+                    <i class="fas fa-check-circle"></i>
+                  </div>
+                  <div class="activity-details">
+                    <div class="activity-server">Creative Server</div>
+                    <div class="activity-message">Backup erfolgreich erstellt</div>
+                  </div>
+                </div>
+                
+                <div class="activity-item">
+                  <div class="activity-time">10:05</div>
+                  <div class="activity-icon info">
+                    <i class="fas fa-info-circle"></i>
+                  </div>
+                  <div class="activity-details">
+                    <div class="activity-server">Creative Server</div>
+                    <div class="activity-message">Spieler MinerPro hat sich angemeldet</div>
+                  </div>
+                </div>
+                
+                <div class="activity-item">
+                  <div class="activity-time">10:00</div>
+                  <div class="activity-icon info">
+                    <i class="fas fa-info-circle"></i>
+                  </div>
+                  <div class="activity-details">
+                    <div class="activity-server">Survival Server</div>
+                    <div class="activity-message">Plugin-Update durchgeführt</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Konsole Tab -->
+            <div id="konsole" class="console-container" style="display: none;">
+              <div class="console-header">
+                <div class="form-group">
+                  <select class="form-input">
+                    <option value="">Server auswählen</option>
+                    <option value="1">Survival Server</option>
+                    <option value="2">Creative Server</option>
+                    <option value="3">Minigames</option>
+                  </select>
+                </div>
+                <div class="console-actions">
+                  <button class="secondary-button">
+                    <i class="fas fa-eraser button-icon"></i>
+                    Leeren
+                  </button>
+                  <button class="secondary-button">
+                    <i class="fas fa-download button-icon"></i>
+                    Logs herunterladen
+                  </button>
+                </div>
+              </div>
+              
+              <div class="console-output">
+                <div class="console-lines">
+                  <div class="console-line log-info">[10:30:15 INFO]: Server gestartet</div>
+                  <div class="console-line log-info">[10:30:16 INFO]: Loading properties</div>
+                  <div class="console-line log-info">[10:30:17 INFO]: Default game type: SURVIVAL</div>
+                  <div class="console-line log-info">[10:30:18 INFO]: Generating keypair</div>
+                  <div class="console-line log-info">[10:30:20 INFO]: Starting Minecraft server on *:25565</div>
+                  <div class="console-line log-info">[10:30:25 INFO]: Preparing level "world"</div>
+                  <div class="console-line log-info">[10:30:30 INFO]: Preparing start region for dimension minecraft:overworld</div>
+                  <div class="console-line log-warning">[10:30:35 WARN]: Kann Plugin XYZ nicht laden: Fehlerhafte Konfiguration</div>
+                  <div class="console-line log-info">[10:30:40 INFO]: Done (12.345s)! For help, type "help"</div>
+                  <div class="console-line log-info">[10:31:00 INFO]: Spieler[GamerXYZ/192.168.1.123] hat sich angemeldet</div>
+                  <div class="console-line log-error">[10:31:10 ERROR]: Fehler beim Laden eines Chunks: java.lang.NullPointerException</div>
+                  <div class="console-line log-info">[10:31:15 INFO]: Saving chunks for level "world"</div>
+                </div>
+              </div>
+              
+              <div class="console-input">
+                <input type="text" class="form-input" placeholder="Befehl eingeben...">
+                <button class="primary-button">
+                  <i class="fas fa-terminal button-icon"></i>
+                  Ausführen
+                </button>
+              </div>
+            </div>
+            
+            <!-- Leistung Tab -->
+            <div id="leistung" class="performance-container" style="display: none;">
+              <div class="performance-header">
+                <div class="form-group">
+                  <select class="form-input">
+                    <option value="">Server auswählen</option>
+                    <option value="1">Survival Server</option>
+                    <option value="2">Creative Server</option>
+                    <option value="3">Minigames</option>
+                  </select>
+                </div>
+                <div class="time-range-selector">
+                  <button class="time-range-button active">1h</button>
+                  <button class="time-range-button">6h</button>
+                  <button class="time-range-button">24h</button>
+                  <button class="time-range-button">7d</button>
+                </div>
+              </div>
+              
+              <div class="performance-graphs">
+                <div class="content-card performance-chart">
+                  <h3 class="chart-title">CPU-Auslastung</h3>
+                  <div class="chart-container">
+                    <div class="chart-placeholder">CPU-Chart</div>
+                  </div>
+                </div>
+                
+                <div class="content-card performance-chart">
+                  <h3 class="chart-title">RAM-Nutzung</h3>
+                  <div class="chart-container">
+                    <div class="chart-placeholder">RAM-Chart</div>
+                  </div>
+                </div>
+                
+                <div class="content-card performance-chart">
+                  <h3 class="chart-title">TPS (Ticks per Second)</h3>
+                  <div class="chart-container">
+                    <div class="chart-placeholder">TPS-Chart</div>
+                  </div>
+                </div>
+                
+                <div class="content-card performance-chart">
+                  <h3 class="chart-title">Spieleranzahl</h3>
+                  <div class="chart-container">
+                    <div class="chart-placeholder">Spieler-Chart</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Add Server Modal -->
+    <div id="addServerModal" class="modal-overlay">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2 class="modal-title">Server hinzufügen</h2>
+          <button class="modal-close" onclick="document.getElementById('addServerModal').classList.remove('active')">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Server-Name</label>
+            <input type="text" class="form-input" placeholder="Mein Minecraft-Server">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Server-Adresse</label>
+            <input type="text" class="form-input" placeholder="z.B. mc.example.com oder 192.168.1.100">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Port</label>
+            <input type="text" class="form-input" value="25565" placeholder="25565">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Server-Typ</label>
+            <select class="form-input">
+              <option value="vanilla">Vanilla</option>
+              <option value="spigot">Spigot</option>
+              <option value="paper" selected>Paper</option>
+              <option value="forge">Forge</option>
+              <option value="fabric">Fabric</option>
+              <option value="bungeecord">BungeeCord</option>
+              <option value="waterfall">Waterfall</option>
+              <option value="velocity">Velocity</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">RAM (GB)</label>
+            <div class="ram-slider-container">
+              <input type="range" min="1" max="16" value="4" class="ram-slider" oninput="this.nextElementSibling.innerHTML = this.value + ' GB'">
+              <span class="ram-value">4 GB</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="secondary-button" onclick="document.getElementById('addServerModal').classList.remove('active')">Abbrechen</button>
+          <button class="primary-button" onclick="document.getElementById('addServerModal').classList.remove('active')">Server hinzufügen</button>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Delete Confirmation Modal -->
+    <div id="deleteServerModal" class="modal-overlay">
+      <div class="modal-container delete-modal">
+        <div class="modal-header">
+          <h2 class="modal-title">Server löschen</h2>
+          <button class="modal-close" onclick="document.getElementById('deleteServerModal').classList.remove('active')">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        <div class="modal-body">
+          <div class="delete-warning">
+            <i class="fas fa-exclamation-triangle warning-icon"></i>
+            <p>Bist du sicher, dass du den Server <strong>Survival Server</strong> löschen möchtest?</p>
+            <p class="warning-text">Diese Aktion kann nicht rückgängig gemacht werden. Alle Serverdaten, Welten und Konfigurationen werden gelöscht.</p>
+          </div>
+          <div class="confirm-delete">
+            <div class="form-group">
+              <label class="form-label">Gib "LÖSCHEN" ein, um zu bestätigen</label>
+              <input type="text" class="form-input" id="deleteConfirmation" placeholder="LÖSCHEN" oninput="toggleDeleteButton()">
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button class="secondary-button" onclick="document.getElementById('deleteServerModal').classList.remove('active')">Abbrechen</button>
+          <button id="confirmDeleteButton" class="danger-button" disabled onclick="document.getElementById('deleteServerModal').classList.remove('active')">
+            Server permanent löschen
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Tab switching
+    function switchTab(tabElement, tabId) {
+      // Remove active class from all tabs
+      const tabs = document.querySelectorAll('.tab-item');
+      tabs.forEach(tab => tab.classList.remove('active'));
+      
+      // Add active class to clicked tab
+      tabElement.classList.add('active');
+      
+      // Hide all tab contents
+      const tabContents = document.querySelectorAll('.tab-content > div');
+      tabContents.forEach(content => content.style.display = 'none');
+      
+      // Show the selected tab content
+      document.getElementById(tabId).style.display = 'block';
+    }
+    
+    // Toggle delete button based on confirmation input
+    function toggleDeleteButton() {
+      const confirmInput = document.getElementById('deleteConfirmation');
+      const deleteButton = document.getElementById('confirmDeleteButton');
+      
+      if (confirmInput.value === 'LÖSCHEN') {
+        deleteButton.disabled = false;
+      } else {
+        deleteButton.disabled = true;
+      }
+    }
+  </script>
+</body>
+</html>
